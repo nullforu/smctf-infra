@@ -1,1 +1,0 @@
-# SMCTF Infra
