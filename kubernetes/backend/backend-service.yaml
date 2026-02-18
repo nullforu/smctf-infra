@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smctf-backend
+  namespace: backend
+spec:
+  selector:
+    app: smctf-backend
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      # Must be within backend NodePort range (default: 30000-31000)
+      nodePort: 30080

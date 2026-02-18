@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smctf-backend
+  namespace: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smctf-backend
+  template:
+    metadata:
+      labels:
+        app: smctf-backend
+    spec:
+      serviceAccountName: smctf-backend
+      automountServiceAccountToken: true
+      nodeSelector:
+        role: backend
+      containers:
+        - name: smctf-backend-app
+          image: 986129558966.dkr.ecr.ap-northeast-2.amazonaws.com/backend:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: smctf-backend-config
+            - secretRef:
+                name: smctf-backend-secret

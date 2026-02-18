@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: stacks-resource-quota
+  namespace: stacks
+spec:
+  hard:
+    requests.cpu: "6" # For example
+    requests.memory: "6Gi"
+    limits.cpu: "6"
+    limits.memory: "6Gi"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: stacks-limit-range
+  namespace: stacks
+spec:
+  limits:
+    - type: Container
+      max:
+        cpu: "500m"
+        memory: "512Mi"
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "500m"
+        memory: "512Mi"
