@@ -1,0 +1,80 @@
+{{- if and .Values.backend.enabled .Values.backend.ingress.enabled .Values.backend.ingress.http.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.backend.deployment.name }}
+  namespace: {{ .Values.namespaces.backend }}
+  annotations:
+{{ toYaml .Values.backend.ingress.annotations | indent 4 }}
+    alb.ingress.kubernetes.io/listen-ports: {{ .Values.backend.ingress.http.listenPorts | quote }}
+    {{- if .Values.backend.ingress.securityGroupId }}
+    alb.ingress.kubernetes.io/security-groups: {{ .Values.backend.ingress.securityGroupId | quote }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.backend.ingress.className }}
+  rules:
+    {{- if .Values.backend.ingress.host }}
+    - host: {{ .Values.backend.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.backend.ingress.path }}
+            pathType: {{ .Values.backend.ingress.pathType }}
+            backend:
+              service:
+                name: {{ .Values.backend.service.name }}
+                port:
+                  number: {{ .Values.backend.service.port }}
+    {{- else }}
+    - http:
+        paths:
+          - path: {{ .Values.backend.ingress.path }}
+            pathType: {{ .Values.backend.ingress.pathType }}
+            backend:
+              service:
+                name: {{ .Values.backend.service.name }}
+                port:
+                  number: {{ .Values.backend.service.port }}
+    {{- end }}
+---
+{{- end }}
+{{- if and .Values.backend.enabled .Values.backend.ingress.enabled .Values.backend.ingress.https.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.backend.deployment.name }}-https
+  namespace: {{ .Values.namespaces.backend }}
+  annotations:
+{{ toYaml .Values.backend.ingress.annotations | indent 4 }}
+    alb.ingress.kubernetes.io/listen-ports: {{ .Values.backend.ingress.https.listenPorts | quote }}
+    {{- if .Values.backend.ingress.securityGroupId }}
+    alb.ingress.kubernetes.io/security-groups: {{ .Values.backend.ingress.securityGroupId | quote }}
+    {{- end }}
+    {{- if .Values.backend.ingress.https.certificateArn }}
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.backend.ingress.https.certificateArn | quote }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.backend.ingress.className }}
+  rules:
+    {{- if .Values.backend.ingress.host }}
+    - host: {{ .Values.backend.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.backend.ingress.path }}
+            pathType: {{ .Values.backend.ingress.pathType }}
+            backend:
+              service:
+                name: {{ .Values.backend.service.name }}
+                port:
+                  number: {{ .Values.backend.service.port }}
+    {{- else }}
+    - http:
+        paths:
+          - path: {{ .Values.backend.ingress.path }}
+            pathType: {{ .Values.backend.ingress.pathType }}
+            backend:
+              service:
+                name: {{ .Values.backend.service.name }}
+                port:
+                  number: {{ .Values.backend.service.port }}
+    {{- end }}
+{{- end }}

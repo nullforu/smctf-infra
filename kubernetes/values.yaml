@@ -1,0 +1,226 @@
+namespaces:
+  create: true
+  backend: backend
+  stacks: stacks
+
+elbController:
+  enabled: true
+  serviceAccount:
+    name: aws-load-balancer-controller
+    namespace: kube-system
+    labels:
+      app.kubernetes.io/name: aws-load-balancer-controller
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::986129558966:role/smctf-dev-irsa-alb
+
+stacksQuota:
+  enabled: true
+  name: stacks-resource-quota
+  namespace: stacks
+  hard:
+    requests.cpu: "6"
+    requests.memory: "6Gi"
+    limits.cpu: "6"
+    limits.memory: "6Gi"
+
+stacksLimitRange:
+  enabled: true
+  name: stacks-limit-range
+  namespace: stacks
+  containerDefaults:
+    max:
+      cpu: "500m"
+      memory: "512Mi"
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "500m"
+      memory: "512Mi"
+
+backendNetworkPolicy:
+  enabled: true
+  name: deny-ingress-to-backend
+  namespace: backend
+  denyFromNamespaces:
+    - stacks
+
+backend:
+  enabled: true
+  serviceAccount:
+    name: smctf-backend
+    namespace: backend
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::986129558966:role/smctf-dev-irsa-backend
+  configName: smctf-backend-config
+  secretName: smctf-backend-secret
+
+  config:
+    APP_ENV: "local"
+    HTTP_ADDR: ":8080"
+    SHUTDOWN_TIMEOUT: "10s"
+    AUTO_MIGRATE: "true"
+    BCRYPT_COST: "12"
+    DB_HOST: "smctf-dev-postgres.cp4cewyumxw7.ap-northeast-2.rds.amazonaws.com"
+    DB_PORT: "5432"
+    DB_USER: "app_user"
+    DB_NAME: "app_db"
+    DB_SSLMODE: "require"
+    DB_MAX_OPEN_CONNS: "25"
+    DB_MAX_IDLE_CONNS: "10"
+    DB_CONN_MAX_LIFETIME: "30m"
+    REDIS_ADDR: "smctf-dev-redis.q2pzrs.ng.0001.apn2.cache.amazonaws.com:6379"
+    REDIS_DB: "0"
+    REDIS_POOL_SIZE: "20"
+    JWT_ISSUER: "smctf"
+    JWT_ACCESS_TTL: "24h"
+    JWT_REFRESH_TTL: "168h"
+    SUBMIT_WINDOW: "1m"
+    SUBMIT_MAX: "10"
+    TIMELINE_CACHE_TTL: "60s"
+    LEADERBOARD_CACHE_TTL: "60s"
+    APP_CONFIG_CACHE_TTL: "2m"
+    CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:5173,https://smctf.example.com,https://ctf.swua.kr"
+    STACKS_ENABLED: "true"
+    STACKS_MAX_PER_USER: "3"
+    STACKS_PROVISIONER_BASE_URL: "http://container-provisioner.backend.svc.cluster.local:8081"
+    STACKS_PROVISIONER_TIMEOUT: "5s"
+    STACKS_CREATE_WINDOW: "1m"
+    STACKS_CREATE_MAX: "1"
+    LOG_DIR: "logs"
+    LOG_FILE_PREFIX: "app"
+    LOG_MAX_BODY_BYTES: "1048576"
+    LOG_WEBHOOK_QUEUE_SIZE: "1000"
+    LOG_WEBHOOK_TIMEOUT: "5s"
+    LOG_WEBHOOK_BATCH_SIZE: "20"
+    LOG_WEBHOOK_BATCH_WAIT: "2s"
+    LOG_WEBHOOK_MAX_CHARS: "1800"
+    S3_ENABLED: "true"
+    S3_REGION: "ap-northeast-2"
+    S3_BUCKET: "smctf-challenges-bucket"
+    # S3_ENDPOINT: ""
+    S3_FORCE_PATH_STYLE: "false"
+    S3_PRESIGN_TTL: "15m"
+
+  secret:
+    DB_PASSWORD: "app_password"
+    REDIS_PASSWORD: ""
+    JWT_SECRET: "change-me"
+    FLAG_HMAC_SECRET: "change-me-too"
+    STACKS_PROVISIONER_API_KEY: "secret"
+    LOG_DISCORD_WEBHOOK_URL: ""
+    LOG_SLACK_WEBHOOK_URL: ""
+    # S3_ACCESS_KEY_ID: ""
+    # S3_SECRET_ACCESS_KEY: ""
+
+  deployment:
+    name: smctf-backend
+    replicas: 2
+    containerName: smctf-backend-app
+    image:
+      repository: 986129558966.dkr.ecr.ap-northeast-2.amazonaws.com/backend
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 8080
+    nodeSelector:
+      role: backend
+    automountServiceAccountToken: true
+
+  service:
+    name: smctf-backend
+    type: NodePort
+    port: 80
+    targetPort: 8080
+    nodePort: 30080
+
+  ingress:
+    enabled: true
+    className: alb
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: instance
+      alb.ingress.kubernetes.io/backend-protocol: HTTP
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    securityGroupId: sg-0e5b8ec1215d1bf69
+    host: ""
+    path: /
+    pathType: Prefix
+    http:
+      enabled: true
+      listenPorts: '[{"HTTP":80}]'
+    https:
+      enabled: false
+      listenPorts: '[{"HTTP":80},{"HTTPS":443}]'
+      certificateArn: arn:aws:acm:ap-northeast-2:986129558966:certificate/3cc6e4d6-c43f-411a-9b5a-3c07105fb2c6
+
+provisioner:
+  enabled: true
+  serviceAccount:
+    name: container-provisioner
+    namespace: backend
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::986129558966:role/smctf-dev-irsa-container-provisioner
+  configName: container-provisioner-config
+  secretName: container-provisioner-secret
+
+  rbac:
+    clusterRoleName: container-provisioner-role
+    clusterRoleBindingName: container-provisioner-binding
+
+  config:
+    APP_ENV: "local"
+    HTTP_ADDR: ":8081"
+    SHUTDOWN_TIMEOUT: "10s"
+    API_KEY_ENABLED: "true"
+    LOG_DIR: "logs"
+    LOG_FILE_PREFIX: "app"
+    LOG_MAX_BODY_BYTES: "1048576"
+    LOG_WEBHOOK_QUEUE_SIZE: "1000"
+    LOG_WEBHOOK_TIMEOUT: "5s"
+    LOG_WEBHOOK_BATCH_SIZE: "20"
+    LOG_WEBHOOK_BATCH_WAIT: "2s"
+    LOG_WEBHOOK_MAX_CHARS: "1800"
+    STACK_NAMESPACE: "stacks"
+    STACK_TTL: "2h"
+    STACK_SCHEDULER_INTERVAL: "10s"
+    STACK_NODEPORT_MIN: "31001"
+    STACK_NODEPORT_MAX: "32767"
+    STACK_PORT_LOCK_TTL: "30s"
+    STACK_NODE_ROLE: "stack"
+    STACK_REQUIRE_INGRESS_NETWORK_POLICY: "true"
+    DDB_USE_MOCK: "false"
+    DDB_STACK_TABLE: "smctf-container-provisioner-stacks"
+    DDB_CONSISTENT_READ: "true"
+    AWS_REGION: "ap-northeast-2"
+    # AWS_ENDPOINT: ""
+    K8S_USE_MOCK: "false"
+    # K8S_KUBECONFIG: ""
+    # K8S_CONTEXT: ""
+    K8S_CLIENT_QPS: "20"
+    K8S_CLIENT_BURST: "40"
+    STACK_SCHEDULING_TIMEOUT: "20s"
+
+  secret:
+    API_KEY: "secret"
+    LOG_DISCORD_WEBHOOK_URL: ""
+    LOG_SLACK_WEBHOOK_URL: ""
+
+  deployment:
+    name: container-provisioner
+    replicas: 2
+    containerName: container-provisioner-app
+    image:
+      repository: 986129558966.dkr.ecr.ap-northeast-2.amazonaws.com/container-provisioner
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 8081
+    nodeSelector:
+      role: backend
+    automountServiceAccountToken: true
+
+  service:
+    name: container-provisioner
+    type: ClusterIP
+    port: 8081
+    targetPort: 8081

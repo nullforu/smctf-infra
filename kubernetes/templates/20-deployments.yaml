@@ -1,0 +1,69 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.deployment.name }}
+  namespace: {{ .Values.namespaces.backend }}
+spec:
+  replicas: {{ .Values.backend.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.deployment.name }}
+    spec:
+      serviceAccountName: {{ .Values.backend.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.backend.deployment.automountServiceAccountToken }}
+      {{- if .Values.backend.deployment.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.backend.deployment.nodeSelector | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.backend.deployment.containerName }}
+          image: {{ .Values.backend.deployment.image.repository }}:{{ .Values.backend.deployment.image.tag }}
+          imagePullPolicy: {{ .Values.backend.deployment.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.deployment.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.backend.configName }}
+            - secretRef:
+                name: {{ .Values.backend.secretName }}
+---
+{{- end }}
+{{- if .Values.provisioner.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.provisioner.deployment.name }}
+  namespace: {{ .Values.namespaces.backend }}
+spec:
+  replicas: {{ .Values.provisioner.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.provisioner.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.provisioner.deployment.name }}
+    spec:
+      serviceAccountName: {{ .Values.provisioner.serviceAccount.name }}
+      automountServiceAccountToken: {{ .Values.provisioner.deployment.automountServiceAccountToken }}
+      {{- if .Values.provisioner.deployment.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.provisioner.deployment.nodeSelector | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.provisioner.deployment.containerName }}
+          image: {{ .Values.provisioner.deployment.image.repository }}:{{ .Values.provisioner.deployment.image.tag }}
+          imagePullPolicy: {{ .Values.provisioner.deployment.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.provisioner.deployment.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.provisioner.configName }}
+            - secretRef:
+                name: {{ .Values.provisioner.secretName }}
+{{- end }}

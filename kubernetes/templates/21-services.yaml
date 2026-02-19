@@ -1,0 +1,34 @@
+{{- if .Values.backend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.backend.service.name }}
+  namespace: {{ .Values.namespaces.backend }}
+spec:
+  selector:
+    app: {{ .Values.backend.deployment.name }}
+  type: {{ .Values.backend.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.backend.service.port }}
+      targetPort: {{ .Values.backend.service.targetPort }}
+      {{- if eq .Values.backend.service.type "NodePort" }}
+      nodePort: {{ .Values.backend.service.nodePort }}
+      {{- end }}
+---
+{{- end }}
+{{- if .Values.provisioner.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.provisioner.service.name }}
+  namespace: {{ .Values.namespaces.backend }}
+spec:
+  selector:
+    app: {{ .Values.provisioner.deployment.name }}
+  type: {{ .Values.provisioner.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.provisioner.service.port }}
+      targetPort: {{ .Values.provisioner.service.targetPort }}
+{{- end }}

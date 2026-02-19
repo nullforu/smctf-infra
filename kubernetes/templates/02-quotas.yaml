@@ -1,0 +1,27 @@
+{{- if .Values.stacksQuota.enabled }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Values.stacksQuota.name }}
+  namespace: {{ .Values.stacksQuota.namespace | default .Values.namespaces.stacks }}
+spec:
+  hard:
+{{ toYaml .Values.stacksQuota.hard | indent 4 }}
+---
+{{- end }}
+{{- if .Values.stacksLimitRange.enabled }}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Values.stacksLimitRange.name }}
+  namespace: {{ .Values.stacksLimitRange.namespace | default .Values.namespaces.stacks }}
+spec:
+  limits:
+    - type: Container
+      max:
+{{ toYaml .Values.stacksLimitRange.containerDefaults.max | indent 8 }}
+      default:
+{{ toYaml .Values.stacksLimitRange.containerDefaults.default | indent 8 }}
+      defaultRequest:
+{{ toYaml .Values.stacksLimitRange.containerDefaults.defaultRequest | indent 8 }}
+{{- end }}
