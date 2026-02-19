@@ -158,3 +158,101 @@ resource "aws_route_table_association" "protected" {
   subnet_id      = each.value.id
   route_table_id = aws_route_table.protected.id
 }
+
+locals {
+  private_route_table_ids   = var.nat_gateway_mode == "per_az" ? [for rt in aws_route_table.private : rt.id] : [aws_route_table.private["single"].id]
+  protected_route_table_ids = [aws_route_table.protected.id]
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  count             = var.enable_s3_vpc_endpoint ? 1 : 0
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${data.aws_region.current.id}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = concat(local.private_route_table_ids, local.protected_route_table_ids)
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-s3"
+  })
+}
+
+resource "aws_vpc_endpoint" "dynamodb" {
+  count             = var.enable_dynamodb_vpc_endpoint ? 1 : 0
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${data.aws_region.current.id}.dynamodb"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = concat(local.private_route_table_ids, local.protected_route_table_ids)
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-dynamodb"
+  })
+}
+
+resource "aws_security_group" "ssm_endpoints" {
+  count       = var.enable_ssm_vpc_endpoints ? 1 : 0
+  name        = "${var.name_prefix}-ssm-endpoints"
+  description = "SSM VPC endpoints security group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-ssm-endpoints"
+  })
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  count               = var.enable_ssm_vpc_endpoints ? 1 : 0
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.id}.ssm"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = values(aws_subnet.private)[*].id
+  security_group_ids  = [aws_security_group.ssm_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-ssm"
+  })
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  count               = var.enable_ssm_vpc_endpoints ? 1 : 0
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.id}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = values(aws_subnet.private)[*].id
+  security_group_ids  = [aws_security_group.ssm_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-ssmmessages"
+  })
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  count               = var.enable_ssm_vpc_endpoints ? 1 : 0
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.id}.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = values(aws_subnet.private)[*].id
+  security_group_ids  = [aws_security_group.ssm_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-ec2messages"
+  })
+}
+
+data "aws_region" "current" {}

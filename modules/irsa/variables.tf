@@ -18,6 +18,10 @@ variable "irsa_namespace" {
   type = string
 }
 
+variable "irsa_alb_namespace" {
+  type = string
+}
+
 variable "irsa_service_accounts" {
   type = map(string)
 }
@@ -32,4 +36,8 @@ variable "s3_bucket_arn" {
 
 variable "alb_policy_json" {
   type = any
+}
+
+variable "ecr_repository_arns" {
+  type = list(string)
 }

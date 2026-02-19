@@ -85,3 +85,19 @@ variable "alb_ingress_cidrs" {
 variable "extra_node_role_policy_arns" {
   type = list(string)
 }
+
+variable "enable_network_policy" {
+  type = bool
+}
+
+variable "vpc_cni_addon_version" {
+  type = string
+}
+
+variable "vpc_cni_service_account_role_arn" {
+  type = string
+}
+
+variable "coredns_addon_version" {
+  type = string
+}

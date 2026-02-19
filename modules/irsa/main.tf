@@ -70,6 +70,13 @@ resource "aws_iam_policy" "ecr_access" {
           "ecr:DescribeRepositories",
           "ecr:ListImages"
         ]
+        Resource = var.ecr_repository_arns
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
         Resource = "*"
       }
     ]
@@ -97,7 +104,7 @@ resource "aws_iam_role" "irsa_alb" {
         Condition = {
           StringEquals = {
             "${local.oidc_issuer_hostpath}:aud" = "sts.amazonaws.com",
-            "${local.oidc_issuer_hostpath}:sub" = "system:serviceaccount:${var.irsa_namespace}:${var.irsa_service_accounts.alb_controller}"
+            "${local.oidc_issuer_hostpath}:sub" = "system:serviceaccount:${var.irsa_alb_namespace}:${var.irsa_service_accounts.alb_controller}"
           }
         }
       }

@@ -10,6 +10,7 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0"
     }
+
     tls = {
       source  = "hashicorp/tls"
       version = ">= 4.0"
@@ -40,12 +41,12 @@ locals {
   alb_policy_json = yamldecode(file("${path.module}/polices/elb_irsa_policy.yaml"))
 }
 
-
 module "network" {
   source = "./modules/network"
 
-  name_prefix            = local.name_prefix
-  tags                   = local.tags
+  name_prefix = local.name_prefix
+  tags        = local.tags
+
   vpc_cidr               = var.vpc_cidr
   azs                    = var.azs
   public_subnet_cidrs    = var.public_subnet_cidrs
@@ -53,16 +54,22 @@ module "network" {
   protected_subnet_cidrs = var.protected_subnet_cidrs
   nat_gateway_mode       = var.nat_gateway_mode
   eks_cluster_name       = var.eks_cluster_name
+
+  enable_ssm_vpc_endpoints     = var.enable_ssm_vpc_endpoints
+  enable_s3_vpc_endpoint       = var.enable_s3_vpc_endpoint
+  enable_dynamodb_vpc_endpoint = var.enable_dynamodb_vpc_endpoint
 }
 
 module "eks" {
   source = "./modules/eks"
 
-  name_prefix                 = local.name_prefix
-  tags                        = local.tags
-  vpc_id                      = module.network.vpc_id
-  public_subnet_ids           = module.network.public_subnet_ids
-  private_subnet_ids          = module.network.private_subnet_ids
+  name_prefix = local.name_prefix
+  tags        = local.tags
+
+  vpc_id             = module.network.vpc_id
+  public_subnet_ids  = module.network.public_subnet_ids
+  private_subnet_ids = module.network.private_subnet_ids
+
   eks_cluster_name            = var.eks_cluster_name
   eks_version                 = var.eks_version
   eks_endpoint_public_access  = var.eks_endpoint_public_access
@@ -83,7 +90,11 @@ module "eks" {
   stack_nodeport_cidrs   = var.stack_nodeport_cidrs
   alb_ingress_cidrs      = var.alb_ingress_cidrs
 
-  extra_node_role_policy_arns = var.extra_node_role_policy_arns
+  extra_node_role_policy_arns      = var.extra_node_role_policy_arns
+  enable_network_policy            = var.enable_network_policy
+  vpc_cni_addon_version            = var.vpc_cni_addon_version
+  vpc_cni_service_account_role_arn = var.vpc_cni_service_account_role_arn
+  coredns_addon_version            = var.coredns_addon_version
 }
 
 module "storage" {
@@ -92,8 +103,12 @@ module "storage" {
   name_prefix = local.name_prefix
   tags        = local.tags
 
-  s3_challenge_bucket_name = var.s3_challenge_bucket_name
-  ecr_repository_name      = var.ecr_repository_name
+  s3_challenge_bucket_name   = var.s3_challenge_bucket_name
+  create_s3_challenge_bucket = var.create_s3_challenge_bucket
+  s3_cors_rules              = var.s3_cors_rules
+
+  ecr_repository_names    = var.ecr_repository_names
+  create_ecr_repositories = var.create_ecr_repositories
 
   dynamodb_table_name           = var.dynamodb_table_name
   dynamodb_billing_mode         = var.dynamodb_billing_mode
@@ -112,10 +127,12 @@ module "irsa" {
   oidc_issuer_url   = module.eks.oidc_issuer_url
 
   irsa_namespace        = var.irsa_namespace
+  irsa_alb_namespace    = var.irsa_alb_namespace
   irsa_service_accounts = var.irsa_service_accounts
 
-  dynamodb_table_arn = module.storage.dynamodb_table_arn
-  s3_bucket_arn      = module.storage.s3_bucket_arn
+  dynamodb_table_arn  = module.storage.dynamodb_table_arn
+  s3_bucket_arn       = module.storage.s3_bucket_arn
+  ecr_repository_arns = values(module.storage.ecr_repository_arns)
 
   alb_policy_json = local.alb_policy_json
 }
@@ -123,10 +140,12 @@ module "irsa" {
 module "db" {
   source = "./modules/db"
 
-  name_prefix          = local.name_prefix
-  tags                 = local.tags
+  name_prefix = local.name_prefix
+  tags        = local.tags
+
   protected_subnet_ids = module.network.protected_subnet_ids
   backend_nodes_sg_id  = module.eks.backend_nodes_sg_id
+  bastion_sg_id        = module.bastion.security_group_id
 
   rds_instance_class        = var.rds_instance_class
   rds_allocated_storage_gb  = var.rds_allocated_storage_gb
@@ -147,8 +166,9 @@ module "db" {
 module "bastion" {
   source = "./modules/bastion"
 
-  name_prefix        = local.name_prefix
-  tags               = local.tags
+  name_prefix = local.name_prefix
+  tags        = local.tags
+
   create             = var.create_bastion
   vpc_id             = module.network.vpc_id
   private_subnet_ids = module.network.private_subnet_ids

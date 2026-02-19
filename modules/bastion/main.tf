@@ -5,19 +5,8 @@ check "bastion_subnet_index" {
   }
 }
 
-data "aws_ami" "al2023" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["al2023-ami-*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+data "aws_ssm_parameter" "al2_ami" {
+  name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
 }
 
 resource "aws_iam_role" "bastion" {
@@ -72,7 +61,7 @@ resource "aws_security_group" "bastion" {
 
 resource "aws_instance" "bastion" {
   count                       = var.create ? 1 : 0
-  ami                         = var.ami_id != null ? var.ami_id : data.aws_ami.al2023.id
+  ami                         = var.ami_id != null ? var.ami_id : data.aws_ssm_parameter.al2_ami.value
   instance_type               = var.instance_type
   subnet_id                   = var.private_subnet_ids[var.subnet_index]
   vpc_security_group_ids      = [aws_security_group.bastion[0].id]

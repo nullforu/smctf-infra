@@ -122,6 +122,60 @@ resource "aws_security_group" "backend_nodes" {
   })
 }
 
+resource "aws_security_group_rule" "eks_cluster_from_stack_nodes_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.stack_nodes.id
+}
+
+resource "aws_security_group_rule" "eks_cluster_from_backend_nodes_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.backend_nodes.id
+}
+
+resource "aws_security_group_rule" "stack_nodes_from_backend_nodes_dns_tcp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.stack_nodes.id
+  source_security_group_id = aws_security_group.backend_nodes.id
+}
+
+resource "aws_security_group_rule" "stack_nodes_from_backend_nodes_dns_udp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.stack_nodes.id
+  source_security_group_id = aws_security_group.backend_nodes.id
+}
+
+resource "aws_security_group_rule" "backend_nodes_from_stack_nodes_dns_tcp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.backend_nodes.id
+  source_security_group_id = aws_security_group.stack_nodes.id
+}
+
+resource "aws_security_group_rule" "backend_nodes_from_stack_nodes_dns_udp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.backend_nodes.id
+  source_security_group_id = aws_security_group.stack_nodes.id
+}
+
 resource "aws_iam_role" "eks_cluster" {
   name = "${var.name_prefix}-eks-cluster"
 
@@ -225,6 +279,12 @@ resource "aws_launch_template" "backend_nodes" {
 
   vpc_security_group_ids = [aws_security_group.backend_nodes.id]
 
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
   tags = var.tags
 
   lifecycle {
@@ -280,6 +340,41 @@ resource "aws_eks_node_group" "backend" {
   }
 
   tags = var.tags
+}
+
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "vpc-cni"
+  addon_version               = var.vpc_cni_addon_version
+  service_account_role_arn    = var.vpc_cni_service_account_role_arn
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  configuration_values = var.enable_network_policy ? jsonencode({
+    enableNetworkPolicy = "true"
+  }) : null
+
+  depends_on = [
+    aws_eks_cluster.main,
+  ]
+}
+
+resource "aws_eks_addon" "coredns" {
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "coredns"
+  addon_version               = var.coredns_addon_version
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  configuration_values = jsonencode({
+    nodeSelector = {
+      role = "backend"
+    }
+  })
+
+  depends_on = [
+    aws_eks_cluster.main,
+  ]
 }
 
 resource "aws_iam_openid_connect_provider" "eks" {

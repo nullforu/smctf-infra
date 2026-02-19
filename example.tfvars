@@ -13,7 +13,7 @@ protected_subnet_cidrs = ["10.0.111.0/24", "10.0.121.0/24"]
 nat_gateway_mode = "single"
 
 eks_cluster_name            = "smctf"
-eks_version                 = "1.34"
+eks_version                 = "1.35"
 eks_endpoint_public_access  = false
 eks_endpoint_private_access = true
 
@@ -55,16 +55,29 @@ redis_engine_version  = null
 redis_multi_az        = false
 redis_num_cache_nodes = 1
 
-s3_challenge_bucket_name = null
-ecr_repository_name      = "smctf-challenges"
-dynamodb_table_name      = "smctf-container-provisioner-stacks"
+s3_challenge_bucket_name   = "smctf-challenges-bucket"
+create_s3_challenge_bucket = false
+# s3_cors_rules = [
+#   {
+#     allowed_headers = ["*"]
+#     allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+#     allowed_origins = ["https://ctf.swua.kr"]
+#     expose_headers  = ["ETag"]
+#     max_age_seconds = 3000
+#   }
+# ]
 
+ecr_repository_names    = ["backend", "container-provisioner", "smctf-challenges"]
+create_ecr_repositories = false
+
+dynamodb_table_name           = "smctf-container-provisioner-stacks"
 dynamodb_billing_mode         = "PAY_PER_REQUEST"
 dynamodb_read_capacity        = 5
 dynamodb_write_capacity       = 5
 enable_point_in_time_recovery = true
 
-irsa_namespace = "backend"
+irsa_namespace     = "backend"
+irsa_alb_namespace = "kube-system"
 irsa_service_accounts = {
   alb_controller        = "aws-load-balancer-controller"
   container_provisioner = "container-provisioner"
@@ -73,9 +86,18 @@ irsa_service_accounts = {
 
 extra_node_role_policy_arns = []
 
+enable_network_policy            = true
+vpc_cni_addon_version            = null
+vpc_cni_service_account_role_arn = null
+coredns_addon_version            = null
+
 create_bastion           = false
 bastion_instance_type    = "t3.micro"
 bastion_ami_id           = null
 bastion_subnet_index     = 0
 bastion_root_volume_size = 20
 bastion_key_name         = null
+
+enable_ssm_vpc_endpoints     = true
+enable_s3_vpc_endpoint       = true
+enable_dynamodb_vpc_endpoint = true

@@ -14,6 +14,10 @@ variable "backend_nodes_sg_id" {
   type = string
 }
 
+variable "bastion_sg_id" {
+  type = string
+}
+
 variable "rds_instance_class" {
   type = string
 }
@@ -65,4 +69,3 @@ variable "redis_multi_az" {
 variable "redis_num_cache_nodes" {
   type = number
 }
-

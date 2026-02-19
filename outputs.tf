@@ -70,8 +70,12 @@ output "s3_challenge_bucket" {
   value = module.storage.s3_bucket_name
 }
 
-output "ecr_repository_url" {
-  value = module.storage.ecr_repository_url
+output "ecr_repository_urls" {
+  value = module.storage.ecr_repository_urls
+}
+
+output "ecr_repository_arns" {
+  value = module.storage.ecr_repository_arns
 }
 
 output "dynamodb_table_name" {

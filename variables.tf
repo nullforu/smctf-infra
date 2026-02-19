@@ -140,6 +140,7 @@ variable "stack_nodeport_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+
 variable "stack_nodeport_range" {
   type = object({
     from = number
@@ -251,13 +252,42 @@ variable "redis_num_cache_nodes" {
 variable "s3_challenge_bucket_name" {
   type        = string
   description = "S3 bucket name for challenge files."
-  default     = null
+  default     = "smctf-challenges-bucket"
 }
 
-variable "ecr_repository_name" {
-  type        = string
-  description = "ECR repository name for challenge images."
-  default     = "smctf-challenges"
+variable "create_s3_challenge_bucket" {
+  type        = bool
+  description = "Whether to create the challenge files bucket."
+  default     = true
+
+  validation {
+    condition     = var.create_s3_challenge_bucket || (var.s3_challenge_bucket_name != null && trim(var.s3_challenge_bucket_name) != "")
+    error_message = "When create_s3_challenge_bucket is false, s3_challenge_bucket_name must be set."
+  }
+}
+
+variable "s3_cors_rules" {
+  type = list(object({
+    allowed_headers = list(string)
+    allowed_methods = list(string)
+    allowed_origins = list(string)
+    expose_headers  = list(string)
+    max_age_seconds = number
+  }))
+  description = "CORS rules for the challenge files bucket. Empty list disables CORS."
+  default     = []
+}
+
+variable "ecr_repository_names" {
+  type        = list(string)
+  description = "ECR repository names to create (backend, provisioner, challenges, etc.)."
+  default     = ["backend", "container-provisioner", "smctf-challenges"]
+}
+
+variable "create_ecr_repositories" {
+  type        = bool
+  description = "Whether to create ECR repositories."
+  default     = true
 }
 
 variable "dynamodb_table_name" {
@@ -296,6 +326,12 @@ variable "irsa_namespace" {
   default     = "backend"
 }
 
+variable "irsa_alb_namespace" {
+  type        = string
+  description = "Kubernetes namespace for ALB controller IRSA."
+  default     = "kube-system"
+}
+
 variable "irsa_service_accounts" {
   type        = map(string)
   description = "Service account names for IRSA roles."
@@ -310,6 +346,30 @@ variable "extra_node_role_policy_arns" {
   type        = list(string)
   description = "Extra IAM policy ARNs to attach to EKS node role."
   default     = []
+}
+
+variable "enable_network_policy" {
+  type        = bool
+  description = "Enable EKS VPC CNI NetworkPolicy support."
+  default     = true
+}
+
+variable "vpc_cni_addon_version" {
+  type        = string
+  description = "EKS VPC CNI addon version (null to use AWS default)."
+  default     = null
+}
+
+variable "vpc_cni_service_account_role_arn" {
+  type        = string
+  description = "IRSA role ARN for the VPC CNI addon (optional)."
+  default     = null
+}
+
+variable "coredns_addon_version" {
+  type        = string
+  description = "CoreDNS addon version (null to use AWS default)."
+  default     = null
 }
 
 
@@ -347,4 +407,22 @@ variable "bastion_key_name" {
   type        = string
   description = "Optional EC2 key pair name for bastion (SSM access doesn't require this)."
   default     = null
+}
+
+variable "enable_ssm_vpc_endpoints" {
+  type        = bool
+  description = "Create VPC interface endpoints for SSM/SSMMessages/EC2Messages."
+  default     = true
+}
+
+variable "enable_s3_vpc_endpoint" {
+  type        = bool
+  description = "Create VPC gateway endpoint for S3."
+  default     = true
+}
+
+variable "enable_dynamodb_vpc_endpoint" {
+  type        = bool
+  description = "Create VPC gateway endpoint for DynamoDB."
+  default     = true
 }

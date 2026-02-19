@@ -1,44 +1,47 @@
 variable "name_prefix" {
-  type        = string
-  description = "Name prefix for resources."
+  type = string
 }
 
 variable "tags" {
-  type        = map(string)
-  description = "Common tags."
+  type = map(string)
 }
 
 variable "vpc_cidr" {
-  type        = string
-  description = "VPC CIDR."
+  type = string
 }
 
 variable "azs" {
-  type        = list(string)
-  description = "AZs to use."
+  type = list(string)
 }
 
 variable "public_subnet_cidrs" {
-  type        = list(string)
-  description = "Public subnet CIDRs."
+  type = list(string)
 }
 
 variable "private_subnet_cidrs" {
-  type        = list(string)
-  description = "Private subnet CIDRs."
+  type = list(string)
 }
 
 variable "protected_subnet_cidrs" {
-  type        = list(string)
-  description = "Protected subnet CIDRs."
+  type = list(string)
 }
 
 variable "nat_gateway_mode" {
-  type        = string
-  description = "NAT gateway placement: single or per_az."
+  type = string
 }
 
 variable "eks_cluster_name" {
-  type        = string
-  description = "EKS cluster name (for subnet tags)."
+  type = string
+}
+
+variable "enable_ssm_vpc_endpoints" {
+  type = bool
+}
+
+variable "enable_s3_vpc_endpoint" {
+  type = bool
+}
+
+variable "enable_dynamodb_vpc_endpoint" {
+  type = bool
 }
