@@ -1,3 +1,27 @@
+# Please fill in the following values before deploying the Helm chart.
+# 
+# - elbController.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
+# - backend.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
+# - provisioner.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
+# - backend.config.DB_HOST (PostgreSQL RDS Endpoint)
+# - backend.config.REDIS_ADDR (ElastiCache Redis Endpoint)
+# - backend.config.S3_REGION, backend.config.S3_BUCKET (S3 Configuration)
+# - backend.secret.DB_PASSWORD (DB Password)
+# - backend.secret.JWT_SECRET, backend.secret.FLAG_HMAC_SECRET (JWT/Flag HMAC Secrets)
+# - backend.secret.STACKS_PROVISIONER_API_KEY (Container Provisioner API Key, should match provisioner.secret.API_KEY)
+# - backend.ingress.securityGroupId (ALB Security Group ID)
+# - backend.ingress.https.certificateArn (ALB Certificate ARN, if HTTPS is enabled)
+# - provisioner.secret.API_KEY (Container Provisioner API Key, should match backend.secret.STACKS_PROVISIONER_API_KEY)
+# - provisioner.config.AWS_REGION, provisioner.config.DDB_STACK_TABLE (DynamoDB Configuration)
+#
+# If you want to update the values, you can use `helm upgrade --install` with `--set` or `-f` to specify a custom values file. For example:
+# 
+# helm upgrade --install smctf . \
+#  --set backend.deployment.image.tag=v1.1.0 \
+#  --set backend.deployment.replicas=3
+# 
+# helm upgrade --install smctf . -f new-values.yaml
+
 namespaces:
   create: true
   backend: backend
