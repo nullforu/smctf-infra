@@ -11,9 +11,9 @@ metadata:
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/healthcheck-path: /healthz
     # Replace with Terraform output: alb_security_group_id
-    alb.ingress.kubernetes.io/security-groups: sg-REPLACE_ME
+    alb.ingress.kubernetes.io/security-groups: sg-0e5b8ec1215d1bf69
     # Replace with Terraform output: acm_certificate_arn
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:123456789012:certificate/REPLACE_ME
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:986129558966:certificate/3cc6e4d6-c43f-411a-9b5a-3c07105fb2c6
 spec:
   ingressClassName: alb
   rules:

@@ -42,17 +42,3 @@ spec:
 #       targetPort: 8081
 #       nodePort: 30080 # Ref: https://github.com/nullforu/container-provisioner-k8s/issues/6
 #   type: LoadBalancer
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: container-provisioner-service
-  namespace: backend
-spec:
-  selector:
-    app: container-provisioner
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8081
-  type: ClusterIP
