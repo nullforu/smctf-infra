@@ -166,17 +166,18 @@ backend:
       alb.ingress.kubernetes.io/target-type: instance
       alb.ingress.kubernetes.io/backend-protocol: HTTP
       alb.ingress.kubernetes.io/healthcheck-path: /healthz
-    securityGroupId: sg-0e5b8ec1215d1bf69
+    # securityGroupId: sg-0316b2f31ab20189d
     host: ""
     path: /
     pathType: Prefix
     http:
-      enabled: true
+      enabled: false
       listenPorts: '[{"HTTP":80}]'
     https:
-      enabled: false
+      enabled: true
       listenPorts: '[{"HTTP":80},{"HTTPS":443}]'
       certificateArn: arn:aws:acm:ap-northeast-2:986129558966:certificate/3cc6e4d6-c43f-411a-9b5a-3c07105fb2c6
+      sslRedirect: true
 
 provisioner:
   enabled: true

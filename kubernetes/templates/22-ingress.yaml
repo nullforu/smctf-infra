@@ -49,6 +49,9 @@ metadata:
     {{- if .Values.backend.ingress.securityGroupId }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.backend.ingress.securityGroupId | quote }}
     {{- end }}
+    {{- if .Values.backend.ingress.https.sslRedirect }}
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    {{- end }}
     {{- if .Values.backend.ingress.https.certificateArn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.backend.ingress.https.certificateArn | quote }}
     {{- end }}

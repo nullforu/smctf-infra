@@ -26,7 +26,7 @@
 ```
 
 ```
-kubectl apply -f cluster/namespace.yaml
+kubectl apply -f cluster/namespaces.yaml
 kubectl apply -f cluster/elb-controller-serviceaccount.yaml
 kubectl apply -f cluster/networkpolicy.yaml
 kubectl apply -f cluster/quotas.yaml
@@ -38,7 +38,7 @@ kubectl apply -f backend/backend-secret.yaml
 kubectl apply -f backend/backend-config.yaml
 kubectl apply -f backend/backend-deployment.yaml
 kubectl apply -f backend/backend-service.yaml
-kubectl apply -f backend/backend-ingress.yaml
+kubectl apply -f backend/backend-ingress-https.yaml
 ```
 
 ```
