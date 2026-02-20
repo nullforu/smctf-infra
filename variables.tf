@@ -261,7 +261,7 @@ variable "create_s3_challenge_bucket" {
   default     = true
 
   validation {
-    condition     = var.create_s3_challenge_bucket || (var.s3_challenge_bucket_name != null && trim(var.s3_challenge_bucket_name) != "")
+    condition     = var.create_s3_challenge_bucket || (var.s3_challenge_bucket_name != null && trimspace(var.s3_challenge_bucket_name) != "")
     error_message = "When create_s3_challenge_bucket is false, s3_challenge_bucket_name must be set."
   }
 }

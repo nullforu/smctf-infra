@@ -57,7 +57,7 @@ resource "aws_s3_bucket_cors_configuration" "challenge_files" {
 }
 
 resource "aws_ecr_repository" "repos" {
-  for_each             = var.create_ecr_repositories ? toset(var.ecr_repository_names) : {}
+  for_each             = var.create_ecr_repositories ? toset(var.ecr_repository_names) : toset([])
   name                 = each.value
   image_tag_mutability = "MUTABLE"
 
@@ -69,7 +69,7 @@ resource "aws_ecr_repository" "repos" {
 }
 
 data "aws_ecr_repository" "repos" {
-  for_each = var.create_ecr_repositories ? {} : toset(var.ecr_repository_names)
+  for_each = var.create_ecr_repositories ? toset([]) : toset(var.ecr_repository_names)
   name     = each.value
 }
 

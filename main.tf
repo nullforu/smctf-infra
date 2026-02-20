@@ -15,6 +15,11 @@ terraform {
       source  = "hashicorp/tls"
       version = ">= 4.0"
     }
+
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9"
+    }
   }
 
   backend "s3" {

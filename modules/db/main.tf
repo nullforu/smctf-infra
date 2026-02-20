@@ -47,10 +47,14 @@ resource "aws_security_group" "redis" {
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.name_prefix}-db-subnet"
+  name       = "${var.name_prefix}-db-subnet-${substr(data.aws_vpc.selected.id, 0, 8)}"
   subnet_ids = var.protected_subnet_ids
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "main" {
@@ -70,16 +74,22 @@ resource "aws_db_instance" "main" {
   backup_retention_period   = var.rds_backup_retention_days
   deletion_protection       = var.rds_deletion_protection
   skip_final_snapshot       = false
-  final_snapshot_identifier = "${var.name_prefix}-postgres-final"
+  final_snapshot_identifier = "${var.name_prefix}-postgres-final-${formatdate("YYYYMMDDhhmm", time_static.rds_snapshot.rfc3339)}"
 
   tags = var.tags
 }
 
+resource "time_static" "rds_snapshot" {}
+
 resource "aws_elasticache_subnet_group" "main" {
-  name       = "${var.name_prefix}-redis-subnet"
+  name       = "${var.name_prefix}-redis-subnet-${substr(data.aws_vpc.selected.id, 0, 8)}"
   subnet_ids = var.protected_subnet_ids
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_elasticache_replication_group" "main" {
