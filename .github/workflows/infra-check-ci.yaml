@@ -1,0 +1,53 @@
+name: Infra Checks
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    name: Terraform Fmt & Validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive -diff
+
+      - name: Terraform Init (No Backend)
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+  helm:
+    name: Helm Lint & Template
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/kubernetes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm Lint
+        run: helm lint . -f values.yaml
+
+      - name: Helm Template
+        run: helm template smctf . -f values.yaml > /tmp/smctf-rendered.yaml
