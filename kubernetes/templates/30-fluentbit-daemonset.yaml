@@ -1,0 +1,61 @@
+{{- if .Values.fluentbit.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit-cloudwatch
+  namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging }}
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit-cloudwatch
+  template:
+    metadata:
+      labels:
+        app: fluent-bit-cloudwatch
+    spec:
+      serviceAccountName: {{ .Values.fluentbit.serviceAccount.name }}
+      terminationGracePeriodSeconds: 30
+      {{- if .Values.fluentbit.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.fluentbit.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.fluentbit.tolerations }}
+      tolerations:
+{{ toYaml .Values.fluentbit.tolerations | indent 8 }}
+      {{- end }}
+      containers:
+        - name: fluent-bit
+          image: {{ .Values.fluentbit.image.repository }}:{{ .Values.fluentbit.image.tag }}
+          imagePullPolicy: {{ .Values.fluentbit.image.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.fluentbit.env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          resources:
+{{ toYaml .Values.fluentbit.resources | indent 12 }}
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: fluentbit-pos
+              mountPath: /var/log/fluent-bit
+            - name: fluentbit-config
+              mountPath: /fluent-bit/etc/fluent-bit.conf
+              subPath: fluent-bit.conf
+            - name: fluentbit-config
+              mountPath: /fluent-bit/etc/parsers.conf
+              subPath: parsers.conf
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+            type: DirectoryOrCreate
+        - name: fluentbit-pos
+          hostPath:
+            path: /var/log/fluent-bit
+            type: DirectoryOrCreate
+        - name: fluentbit-config
+          configMap:
+            name: {{ .Values.fluentbit.configMapName }}
+{{- end }}
