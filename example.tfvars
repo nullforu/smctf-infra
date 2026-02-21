@@ -76,12 +76,14 @@ dynamodb_read_capacity        = 5
 dynamodb_write_capacity       = 5
 enable_point_in_time_recovery = true
 
-irsa_namespace     = "backend"
-irsa_alb_namespace = "kube-system"
+irsa_namespace         = "backend"
+irsa_alb_namespace     = "kube-system"
+irsa_logging_namespace = "logging"
 irsa_service_accounts = {
   alb_controller        = "aws-load-balancer-controller"
   container_provisioner = "container-provisioner"
   backend_service       = "smctf-backend"
+  fluentbit             = "fluent-bit-cloudwatch"
 }
 
 extra_node_role_policy_arns = []

@@ -332,6 +332,12 @@ variable "irsa_alb_namespace" {
   default     = "kube-system"
 }
 
+variable "irsa_logging_namespace" {
+  type        = string
+  description = "Kubernetes namespace for logging IRSA."
+  default     = "logging"
+}
+
 variable "irsa_service_accounts" {
   type        = map(string)
   description = "Service account names for IRSA roles."
@@ -339,6 +345,7 @@ variable "irsa_service_accounts" {
     alb_controller        = "aws-load-balancer-controller"
     container_provisioner = "container-provisioner"
     backend_service       = "smctf-backend"
+    fluentbit             = "fluent-bit-cloudwatch"
   }
 }
 

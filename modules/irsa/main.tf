@@ -83,6 +83,29 @@ resource "aws_iam_policy" "ecr_access" {
   })
 }
 
+resource "aws_iam_policy" "cloudwatch_logs" {
+  name        = "${var.name_prefix}-cloudwatch-logs"
+  description = "CloudWatch Logs access for Fluent Bit"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents",
+          "logs:PutRetentionPolicy"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "alb_controller" {
   name        = "${var.name_prefix}-alb-controller"
   description = "ALB controller policy"
@@ -117,6 +140,36 @@ resource "aws_iam_role" "irsa_alb" {
 resource "aws_iam_role_policy_attachment" "irsa_alb" {
   role       = aws_iam_role.irsa_alb.name
   policy_arn = aws_iam_policy.alb_controller.arn
+}
+
+resource "aws_iam_role" "irsa_fluentbit" {
+  name = "${var.name_prefix}-irsa-fluentbit"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Principal = {
+          Federated = var.oidc_provider_arn
+        }
+        Condition = {
+          StringEquals = {
+            "${local.oidc_issuer_hostpath}:aud" = "sts.amazonaws.com",
+            "${local.oidc_issuer_hostpath}:sub" = "system:serviceaccount:${var.irsa_logging_namespace}:${var.irsa_service_accounts.fluentbit}"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "irsa_fluentbit_cloudwatch" {
+  role       = aws_iam_role.irsa_fluentbit.name
+  policy_arn = aws_iam_policy.cloudwatch_logs.arn
 }
 
 resource "aws_iam_role" "irsa_container_provisioner" {

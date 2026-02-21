@@ -42,6 +42,10 @@ output "irsa_backend_role_arn" {
   value = module.irsa.irsa_backend_role_arn
 }
 
+output "irsa_fluentbit_role_arn" {
+  value = module.irsa.irsa_fluentbit_role_arn
+}
+
 output "irsa_alb_policy_arn" {
   value = module.irsa.irsa_alb_policy_arn
 }
@@ -56,6 +60,10 @@ output "irsa_s3_policy_arn" {
 
 output "irsa_ecr_policy_arn" {
   value = module.irsa.irsa_ecr_policy_arn
+}
+
+output "irsa_cloudwatch_logs_policy_arn" {
+  value = module.irsa.irsa_cloudwatch_logs_policy_arn
 }
 
 output "rds_endpoint" {

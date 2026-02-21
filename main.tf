@@ -131,9 +131,10 @@ module "irsa" {
   oidc_provider_arn = module.eks.oidc_provider_arn
   oidc_issuer_url   = module.eks.oidc_issuer_url
 
-  irsa_namespace        = var.irsa_namespace
-  irsa_alb_namespace    = var.irsa_alb_namespace
-  irsa_service_accounts = var.irsa_service_accounts
+  irsa_namespace         = var.irsa_namespace
+  irsa_alb_namespace     = var.irsa_alb_namespace
+  irsa_logging_namespace = var.irsa_logging_namespace
+  irsa_service_accounts  = var.irsa_service_accounts
 
   dynamodb_table_arn  = module.storage.dynamodb_table_arn
   s3_bucket_arn       = module.storage.s3_bucket_arn

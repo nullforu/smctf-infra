@@ -10,6 +10,10 @@ output "irsa_backend_role_arn" {
   value = aws_iam_role.irsa_backend.arn
 }
 
+output "irsa_fluentbit_role_arn" {
+  value = aws_iam_role.irsa_fluentbit.arn
+}
+
 output "irsa_alb_policy_arn" {
   value = aws_iam_policy.alb_controller.arn
 }
@@ -24,4 +28,8 @@ output "irsa_s3_policy_arn" {
 
 output "irsa_ecr_policy_arn" {
   value = aws_iam_policy.ecr_access.arn
+}
+
+output "irsa_cloudwatch_logs_policy_arn" {
+  value = aws_iam_policy.cloudwatch_logs.arn
 }
