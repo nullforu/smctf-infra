@@ -10,7 +10,7 @@ See [SMCTF Docs](https://github.com/nullforu/smctf-docs) for more information ab
 
 ![Kubernetes Architecture Diagram](./assets/k8s.drawio.png)
 
-## Logging (Fluent Bit + CloudWatch Logs)
+<!-- ## Logging (Fluent Bit + CloudWatch Logs)
 
 This repository includes a Fluent Bit DaemonSet that tails Kubernetes container logs (stdout/stderr from `/var/log/containers/*.log`) and ships them to CloudWatch Logs.
 
@@ -40,4 +40,4 @@ helm upgrade --install smctf /Users/workspace5/smctf-infra/kubernetes \
 
 ### Notes
 - If you want a different log group name or region, override `fluentbit.env.LOG_GROUP_NAME` and `fluentbit.env.AWS_REGION`.
-- CloudWatch log streams are created with the prefix from `fluentbit.env.LOG_STREAM_PREFIX`.
+- CloudWatch log streams are created with the prefix from `fluentbit.env.LOG_STREAM_PREFIX`. -->
