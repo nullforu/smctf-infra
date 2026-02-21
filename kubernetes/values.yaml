@@ -3,6 +3,7 @@
 # - elbController.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
 # - backend.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
 # - provisioner.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
+# - fluentbit.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
 # - backend.config.DB_HOST (PostgreSQL RDS Endpoint)
 # - backend.config.REDIS_ADDR (ElastiCache Redis Endpoint)
 # - backend.config.S3_REGION, backend.config.S3_BUCKET (S3 Configuration)
@@ -13,6 +14,7 @@
 # - backend.ingress.https.certificateArn (ALB Certificate ARN, if HTTPS is enabled)
 # - provisioner.secret.API_KEY (Container Provisioner API Key, should match backend.secret.STACKS_PROVISIONER_API_KEY)
 # - provisioner.config.AWS_REGION, provisioner.config.DDB_STACK_TABLE (DynamoDB Configuration)
+# - fluentbit.env.LOG_GROUP_NAME (CloudWatch Logs Group Name, usually in the format "/aws/eks/<project>-<env>/logs")
 #
 # If you want to update the values, you can use `helm upgrade --install` with `--set` or `-f` to specify a custom values file. For example:
 # 
@@ -26,6 +28,8 @@ namespaces:
   create: true
   backend: backend
   stacks: stacks
+  logging: logging
+  monitoring: monitoring
 
 elbController:
   enabled: true
@@ -62,12 +66,13 @@ stacksLimitRange:
       cpu: "500m"
       memory: "512Mi"
 
-backendNetworkPolicy:
+stacksDenyNetworkPolicy:
   enabled: true
-  name: deny-ingress-to-backend
-  namespace: backend
-  denyFromNamespaces:
-    - stacks
+  namePrefix: deny-from-stacks
+  denyFromNamespace: stacks
+  namespaces:
+    - monitoring
+    - backend
 
 backend:
   enabled: true
@@ -80,7 +85,7 @@ backend:
   secretName: smctf-backend-secret
 
   config:
-    APP_ENV: "local"
+    APP_ENV: "production"
     HTTP_ADDR: ":8080"
     SHUTDOWN_TIMEOUT: "10s"
     AUTO_MIGRATE: "true"
@@ -125,17 +130,22 @@ backend:
     # S3_ENDPOINT: ""
     S3_FORCE_PATH_STYLE: "false"
     S3_PRESIGN_TTL: "15m"
+    BOOTSTRAP_ADMIN_TEAM: "true"
+    BOOTSTRAP_ADMIN_USER: "true"
+    BOOTSTRAP_ADMIN_USERNAME: "admin"
 
   secret:
     DB_PASSWORD: "app_password"
     REDIS_PASSWORD: ""
-    JWT_SECRET: "change-me"
-    FLAG_HMAC_SECRET: "change-me-too"
-    STACKS_PROVISIONER_API_KEY: "secret"
+    JWT_SECRET: "change-me-strong"
+    FLAG_HMAC_SECRET: "change-me-too-strong"
+    STACKS_PROVISIONER_API_KEY: "secret-strong"
     LOG_DISCORD_WEBHOOK_URL: ""
     LOG_SLACK_WEBHOOK_URL: ""
     # S3_ACCESS_KEY_ID: ""
     # S3_SECRET_ACCESS_KEY: ""
+    BOOTSTRAP_ADMIN_EMAIL: "admin@smctf.com"
+    BOOTSTRAP_ADMIN_PASSWORD: "admin123!"
 
   deployment:
     name: smctf-backend
@@ -227,7 +237,7 @@ provisioner:
     STACK_SCHEDULING_TIMEOUT: "20s"
 
   secret:
-    API_KEY: "secret"
+    API_KEY: "secret-strong"
     LOG_DISCORD_WEBHOOK_URL: ""
     LOG_SLACK_WEBHOOK_URL: ""
 
@@ -249,3 +259,44 @@ provisioner:
     type: ClusterIP
     port: 8081
     targetPort: 8081
+
+fluentbit:
+  enabled: true
+  namespace: logging
+  configMapName: fluent-bit-config
+  serviceAccount:
+    name: fluent-bit-cloudwatch
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::986129558966:role/smctf-dev-irsa-fluentbit
+  image:
+    repository: amazon/aws-for-fluent-bit
+    tag: 3.2.2
+    pullPolicy: IfNotPresent
+  env:
+    AWS_REGION: "ap-northeast-2"
+    LOG_GROUP_NAME: "/aws/eks/smctf-dev/logs"
+    LOG_STREAM_PREFIX: "k8s"
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+    limits:
+      cpu: "200m"
+      memory: "200Mi"
+  nodeSelector: {}
+  tolerations: []
+
+monitoring:
+  enabled: true
+  namespace: monitoring
+  serviceMonitor:
+    labels:
+      release: kube-prometheus-stack
+    interval: 10s
+    scrapeTimeout: 5s
+    metricsPath: /metrics
+    serviceSelectorLabels:
+      backend:
+        app.kubernetes.io/name: backend
+      containerProvisioner:
+        app.kubernetes.io/name: container-provisioner

@@ -1,0 +1,49 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: smctf-backend
+  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring }}
+  {{- if .Values.monitoring.serviceMonitor.labels }}
+  labels:
+{{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespaces.backend }}
+  selector:
+    matchLabels:
+{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.backend }}
+      {{ $k }}: {{ $v | quote }}
+{{- end }}
+  endpoints:
+    - port: http
+      path: {{ .Values.monitoring.serviceMonitor.metricsPath }}
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.monitoring.serviceMonitor.scrapeTimeout }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: container-provisioner
+  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring }}
+  {{- if .Values.monitoring.serviceMonitor.labels }}
+  labels:
+{{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespaces.backend }}
+  selector:
+    matchLabels:
+{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner }}
+      {{ $k }}: {{ $v | quote }}
+{{- end }}
+  endpoints:
+    - port: http
+      path: {{ .Values.monitoring.serviceMonitor.metricsPath }}
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.monitoring.serviceMonitor.scrapeTimeout }}
+{{- end }}

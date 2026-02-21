@@ -22,6 +22,10 @@ variable "irsa_alb_namespace" {
   type = string
 }
 
+variable "irsa_logging_namespace" {
+  type = string
+}
+
 variable "irsa_service_accounts" {
   type = map(string)
 }

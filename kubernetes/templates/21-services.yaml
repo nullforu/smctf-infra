@@ -4,6 +4,17 @@ kind: Service
 metadata:
   name: {{ .Values.backend.service.name }}
   namespace: {{ .Values.namespaces.backend }}
+  labels:
+{{- with .Values.monitoring }}
+{{- with .serviceMonitor }}
+{{- with .serviceSelectorLabels }}
+{{- range $k, $v := .backend }}
+    {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{ include "smctf.labels" . | indent 4 }}
 spec:
   selector:
     app: {{ .Values.backend.deployment.name }}
@@ -23,6 +34,17 @@ kind: Service
 metadata:
   name: {{ .Values.provisioner.service.name }}
   namespace: {{ .Values.namespaces.backend }}
+  labels:
+{{- with .Values.monitoring }}
+{{- with .serviceMonitor }}
+{{- with .serviceSelectorLabels }}
+{{- range $k, $v := .containerProvisioner }}
+    {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{ include "smctf.labels" . | indent 4 }}
 spec:
   selector:
     app: {{ .Values.provisioner.deployment.name }}
