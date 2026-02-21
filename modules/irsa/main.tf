@@ -93,14 +93,23 @@ resource "aws_iam_policy" "cloudwatch_logs" {
       {
         Effect = "Allow"
         Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams",
           "logs:PutLogEvents",
           "logs:PutRetentionPolicy"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:logs:*:*:log-group:/aws/eks/${var.name_prefix}*",
+          "arn:aws:logs:*:*:log-group:/aws/eks/${var.name_prefix}*:log-stream:*"
+        ]
       }
     ]
   })
