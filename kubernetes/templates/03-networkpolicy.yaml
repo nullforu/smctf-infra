@@ -1,9 +1,10 @@
-{{- if .Values.backendNetworkPolicy.enabled }}
+{{- if and .Values.stacksDenyNetworkPolicy.enabled .Values.stacksDenyNetworkPolicy.namespaces }}
+{{- range $ns := .Values.stacksDenyNetworkPolicy.namespaces }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ .Values.backendNetworkPolicy.name }}
-  namespace: {{ .Values.backendNetworkPolicy.namespace | default .Values.namespaces.backend }}
+  name: {{ $.Values.stacksDenyNetworkPolicy.namePrefix }}-{{ $ns }}
+  namespace: {{ $ns }}
 spec:
   podSelector: {}
   policyTypes:
@@ -15,5 +16,6 @@ spec:
               - key: kubernetes.io/metadata.name
                 operator: NotIn
                 values:
-{{ toYaml .Values.backendNetworkPolicy.denyFromNamespaces | indent 18 }}
+                  - {{ $.Values.stacksDenyNetworkPolicy.denyFromNamespace }}
+{{- end }}
 {{- end }}

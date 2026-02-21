@@ -1,4 +1,4 @@
-```
+<!-- ```
 > tree .
 .
 ├── backend
@@ -77,3 +77,12 @@ Key values to set:
 - `fluentbit.serviceAccount.annotations.eks.amazonaws.com/role-arn`
 - `fluentbit.env.AWS_REGION`
 - `fluentbit.env.LOG_GROUP_NAME`
+
+## Monitoring (Prometheus Operator)
+
+When `monitoring.enabled=true`, the chart creates `ServiceMonitor` CRs
+for backend and container-provisioner. Ensure your Prometheus instance selects those CRs by label.
+
+Service label selectors can be customized via:
+- `monitoring.serviceMonitor.serviceSelectorLabels.backend`
+- `monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner` -->

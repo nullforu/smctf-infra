@@ -28,6 +28,7 @@ namespaces:
   backend: backend
   stacks: stacks
   logging: logging
+  monitoring: monitoring
 
 elbController:
   enabled: true
@@ -64,12 +65,13 @@ stacksLimitRange:
       cpu: "500m"
       memory: "512Mi"
 
-backendNetworkPolicy:
+stacksDenyNetworkPolicy:
   enabled: true
-  name: deny-ingress-to-backend
-  namespace: backend
-  denyFromNamespaces:
-    - stacks
+  namePrefix: deny-from-stacks
+  denyFromNamespace: stacks
+  namespaces:
+    - monitoring
+    - backend
 
 backend:
   enabled: true
@@ -282,3 +284,18 @@ fluentbit:
       memory: "200Mi"
   nodeSelector: {}
   tolerations: []
+
+monitoring:
+  enabled: true
+  namespace: monitoring
+  serviceMonitor:
+    labels:
+      release: kube-prometheus-stack
+    interval: 10s
+    scrapeTimeout: 5s
+    metricsPath: /metrics
+    serviceSelectorLabels:
+      backend:
+        app.kubernetes.io/name: backend
+      containerProvisioner:
+        app.kubernetes.io/name: container-provisioner

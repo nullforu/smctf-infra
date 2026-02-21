@@ -4,6 +4,11 @@ kind: Service
 metadata:
   name: {{ .Values.backend.service.name }}
   namespace: {{ .Values.namespaces.backend }}
+  labels:
+{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.backend }}
+    {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{ include "smctf.labels" . | indent 4 }}
 spec:
   selector:
     app: {{ .Values.backend.deployment.name }}
@@ -23,6 +28,11 @@ kind: Service
 metadata:
   name: {{ .Values.provisioner.service.name }}
   namespace: {{ .Values.namespaces.backend }}
+  labels:
+{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner }}
+    {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{ include "smctf.labels" . | indent 4 }}
 spec:
   selector:
     app: {{ .Values.provisioner.deployment.name }}
