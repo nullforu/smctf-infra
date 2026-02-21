@@ -5,8 +5,14 @@ metadata:
   name: {{ .Values.backend.service.name }}
   namespace: {{ .Values.namespaces.backend }}
   labels:
-{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.backend }}
+{{- with .Values.monitoring }}
+{{- with .serviceMonitor }}
+{{- with .serviceSelectorLabels }}
+{{- range $k, $v := .backend }}
     {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{ include "smctf.labels" . | indent 4 }}
 spec:
@@ -29,8 +35,14 @@ metadata:
   name: {{ .Values.provisioner.service.name }}
   namespace: {{ .Values.namespaces.backend }}
   labels:
-{{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner }}
+{{- with .Values.monitoring }}
+{{- with .serviceMonitor }}
+{{- with .serviceSelectorLabels }}
+{{- range $k, $v := .containerProvisioner }}
     {{ $k }}: {{ $v | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{ include "smctf.labels" . | indent 4 }}
 spec:

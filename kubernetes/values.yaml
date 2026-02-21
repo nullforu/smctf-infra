@@ -14,6 +14,7 @@
 # - backend.ingress.https.certificateArn (ALB Certificate ARN, if HTTPS is enabled)
 # - provisioner.secret.API_KEY (Container Provisioner API Key, should match backend.secret.STACKS_PROVISIONER_API_KEY)
 # - provisioner.config.AWS_REGION, provisioner.config.DDB_STACK_TABLE (DynamoDB Configuration)
+# - fluentbit.env.LOG_GROUP_NAME (CloudWatch Logs Group Name, usually in the format "/aws/eks/<project>-<env>/logs")
 #
 # If you want to update the values, you can use `helm upgrade --install` with `--set` or `-f` to specify a custom values file. For example:
 # 
@@ -273,7 +274,7 @@ fluentbit:
     pullPolicy: IfNotPresent
   env:
     AWS_REGION: "ap-northeast-2"
-    LOG_GROUP_NAME: "/aws/eks/smctf/logs"
+    LOG_GROUP_NAME: "/aws/eks/smctf-dev/logs"
     LOG_STREAM_PREFIX: "k8s"
   resources:
     requests:
