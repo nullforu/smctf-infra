@@ -45,3 +45,5 @@ terraform.rc
 # planout
 
 **/*.local.*
+
+.DS_Store

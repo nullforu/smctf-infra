@@ -25,11 +25,21 @@
 # helm upgrade --install smctf . -f new-values.yaml
 
 namespaces:
-  create: true
-  backend: backend
-  stacks: stacks
-  logging: logging
-  monitoring: monitoring
+  backend:
+    name: backend
+    create: true
+
+  stacks:
+    name: stacks
+    create: true
+
+  logging:
+    name: logging
+    create: true
+
+  monitoring:
+    name: monitoring
+    create: false
 
 elbController:
   enabled: true

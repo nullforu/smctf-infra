@@ -1,23 +1,30 @@
-{{- if .Values.namespaces.create }}
+{{- if .Values.namespaces.backend.create }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.namespaces.backend }}
+  name: {{ .Values.namespaces.backend.name }}
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.namespaces.stacks }}
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.namespaces.logging }}
----
-{{- if .Values.monitoring.enabled }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.namespaces.monitoring }}
 {{- end }}
+
+{{- if .Values.namespaces.stacks.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespaces.stacks.name }}
+---
+{{- end }}
+
+{{- if .Values.namespaces.logging.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespaces.logging.name }}
+---
+{{- end }}
+
+{{- if .Values.namespaces.monitoring.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespaces.monitoring.name }}
 {{- end }}
