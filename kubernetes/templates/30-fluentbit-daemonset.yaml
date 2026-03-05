@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: fluent-bit-cloudwatch
-  namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging }}
+  namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging.name }}
 spec:
   selector:
     matchLabels:

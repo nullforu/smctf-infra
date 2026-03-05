@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: smctf-backend
-  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring }}
+  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring.name }}
   {{- if .Values.monitoring.serviceMonitor.labels }}
   labels:
 {{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4 }}
@@ -11,7 +11,7 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Values.namespaces.backend }}
+      - {{ .Values.namespaces.backend.name }}
   selector:
     matchLabels:
 {{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.backend }}
@@ -27,7 +27,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: container-provisioner
-  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring }}
+  namespace: {{ .Values.monitoring.namespace | default .Values.namespaces.monitoring.name }}
   {{- if .Values.monitoring.serviceMonitor.labels }}
   labels:
 {{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4 }}
@@ -35,7 +35,7 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Values.namespaces.backend }}
+      - {{ .Values.namespaces.backend.name }}
   selector:
     matchLabels:
 {{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner }}

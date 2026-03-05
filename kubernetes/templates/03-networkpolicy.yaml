@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: deny-egress-for-labeled-pods-in-stacks
-  namespace: {{ .Values.namespaces.stacks }}
+  namespace: {{ .Values.namespaces.stacks.name }}
 spec:
   podSelector:
     matchLabels:

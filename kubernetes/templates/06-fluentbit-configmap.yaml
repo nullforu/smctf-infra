@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Values.fluentbit.configMapName }}
-  namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging }}
+  namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging.name }}
 data:
   fluent-bit.conf: |
     [SERVICE]

@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.backend.service.name }}
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
   labels:
 {{- with .Values.monitoring }}
 {{- with .serviceMonitor }}
@@ -33,7 +33,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.provisioner.service.name }}
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
   labels:
 {{- with .Values.monitoring }}
 {{- with .serviceMonitor }}
