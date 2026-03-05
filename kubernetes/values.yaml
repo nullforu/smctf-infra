@@ -172,7 +172,7 @@ backend:
       alb.ingress.kubernetes.io/target-type: instance
       alb.ingress.kubernetes.io/backend-protocol: HTTP
       alb.ingress.kubernetes.io/healthcheck-path: /healthz
-    # securityGroupId: sg-0316b2f31ab20189d
+    securityGroupId: sg-0316b2f31ab20189d
     host: ""
     path: /
     pathType: Prefix
