@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.backend.deployment.name }}
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
   annotations:
 {{ toYaml .Values.backend.ingress.annotations | indent 4 }}
     alb.ingress.kubernetes.io/listen-ports: {{ .Values.backend.ingress.http.listenPorts | quote }}
@@ -42,7 +42,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.backend.deployment.name }}-https
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
   annotations:
 {{ toYaml .Values.backend.ingress.annotations | indent 4 }}
     alb.ingress.kubernetes.io/listen-ports: {{ .Values.backend.ingress.https.listenPorts | quote }}

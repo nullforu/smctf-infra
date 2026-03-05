@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.backend.deployment.name }}
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
 spec:
   replicas: {{ .Values.backend.deployment.replicas }}
   selector:
@@ -38,7 +38,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.provisioner.deployment.name }}
-  namespace: {{ .Values.namespaces.backend }}
+  namespace: {{ .Values.namespaces.backend.name }}
 spec:
   replicas: {{ .Values.provisioner.deployment.replicas }}
   selector:

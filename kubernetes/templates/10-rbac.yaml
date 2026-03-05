@@ -27,7 +27,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.provisioner.serviceAccount.name }}
-    namespace: {{ .Values.provisioner.serviceAccount.namespace | default .Values.namespaces.backend }}
+    namespace: {{ .Values.provisioner.serviceAccount.namespace | default .Values.namespaces.backend.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

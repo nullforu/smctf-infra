@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: {{ .Values.stacksQuota.name }}
-  namespace: {{ .Values.stacksQuota.namespace | default .Values.namespaces.stacks }}
+  namespace: {{ .Values.stacksQuota.namespace | default .Values.namespaces.stacks.name }}
 spec:
   hard:
 {{ toYaml .Values.stacksQuota.hard | indent 4 }}
@@ -14,7 +14,7 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: {{ .Values.stacksLimitRange.name }}
-  namespace: {{ .Values.stacksLimitRange.namespace | default .Values.namespaces.stacks }}
+  namespace: {{ .Values.stacksLimitRange.namespace | default .Values.namespaces.stacks.name }}
 spec:
   limits:
     - type: Container

@@ -28,15 +28,12 @@ namespaces:
   backend:
     name: backend
     create: true
-
   stacks:
     name: stacks
     create: true
-
   logging:
     name: logging
     create: true
-
   monitoring:
     name: monitoring
     create: false

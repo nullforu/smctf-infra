@@ -19,5 +19,5 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.fluentbit.serviceAccount.name }}
-    namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging }}
+    namespace: {{ .Values.fluentbit.namespace | default .Values.namespaces.logging.name }}
 {{- end }}
