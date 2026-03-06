@@ -51,3 +51,22 @@ jobs:
 
       - name: Helm Template
         run: helm template smctf . -f values.yaml > /tmp/smctf-rendered.yaml
+
+  helm_observability:
+    name: Helm Lint & Template (Observability)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/kubernetes-observability
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm Lint
+        run: helm lint . -f values.yaml
+
+      - name: Helm Template
+        run: helm template smctf-observability . -f values.yaml > /tmp/smctf-observability-rendered.yaml
