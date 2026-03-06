@@ -1,0 +1,14 @@
+{{- if .Values.namespaces.logging.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespaces.logging.name }}
+---
+{{- end }}
+
+{{- if .Values.namespaces.monitoring.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespaces.monitoring.name }}
+{{- end }}

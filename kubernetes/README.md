@@ -67,22 +67,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set region=ap-northeast-2
 ```
 
-## Fluent Bit (CloudWatch Logs)
+## Observability
 
-Fluent Bit runs as a DaemonSet and tails container stdout/stderr from `/var/log/containers/*.log`.  
-The Helm chart creates the `logging` namespace, ServiceAccount, RBAC, ConfigMap, and DaemonSet when `fluentbit.enabled=true` (default).
-
-Key values to set:
-
-- `fluentbit.serviceAccount.annotations.eks.amazonaws.com/role-arn`
-- `fluentbit.env.AWS_REGION`
-- `fluentbit.env.LOG_GROUP_NAME`
-
-## Monitoring (Prometheus Operator)
-
-When `monitoring.enabled=true`, the chart creates `ServiceMonitor` CRs
-for backend and container-provisioner. Ensure your Prometheus instance selects those CRs by label.
-
-Service label selectors can be customized via:
-- `monitoring.serviceMonitor.serviceSelectorLabels.backend`
-- `monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner` -->
+Logging (Fluent Bit + CloudWatch) and monitoring (ServiceMonitor CRs) are now managed by the
+`kubernetes-observability` Helm chart in this repo. -->

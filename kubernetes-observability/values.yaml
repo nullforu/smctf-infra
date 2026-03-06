@@ -1,0 +1,58 @@
+# Observability values for SMCTF
+#
+# - fluentbit.serviceAccount.annotations.eks.amazonaws.com/role-arn (AWS Account ID/IRSA Role ARN)
+# - fluentbit.env.LOG_GROUP_NAME (CloudWatch Logs Group Name, usually in the format "/aws/eks/<project>-<env>/logs")
+#
+# If you want to update the values, you can use `helm upgrade --install` with `--set` or `-f` to specify a custom values file.
+
+namespaces:
+  logging:
+    name: logging
+    create: true
+  monitoring:
+    name: monitoring
+    create: true
+
+targetNamespaces:
+  backend: backend
+
+fluentbit:
+  enabled: true
+  namespace: logging
+  configMapName: fluent-bit-config
+  serviceAccount:
+    name: fluent-bit-cloudwatch
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::986129558966:role/smctf-dev-irsa-fluentbit
+  image:
+    repository: amazon/aws-for-fluent-bit
+    tag: 3.2.2
+    pullPolicy: IfNotPresent
+  env:
+    AWS_REGION: "ap-northeast-2"
+    LOG_GROUP_NAME: "/aws/eks/smctf-dev/logs"
+    LOG_STREAM_PREFIX: "k8s"
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+    limits:
+      cpu: "200m"
+      memory: "200Mi"
+  nodeSelector: {}
+  tolerations: []
+
+monitoring:
+  enabled: true
+  namespace: monitoring
+  serviceMonitor:
+    labels:
+      release: kube-prometheus-stack
+    interval: 10s
+    scrapeTimeout: 5s
+    metricsPath: /metrics
+    serviceSelectorLabels:
+      backend:
+        app.kubernetes.io/name: backend
+      containerProvisioner:
+        app.kubernetes.io/name: container-provisioner

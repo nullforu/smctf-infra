@@ -5,13 +5,9 @@ metadata:
   name: {{ .Values.backend.service.name }}
   namespace: {{ .Values.namespaces.backend.name }}
   labels:
-{{- with .Values.monitoring }}
-{{- with .serviceMonitor }}
-{{- with .serviceSelectorLabels }}
-{{- range $k, $v := .backend }}
+{{- with .Values.backend.service.labels }}
+{{- range $k, $v := . }}
     {{ $k }}: {{ $v | quote }}
-{{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{ include "smctf.labels" . | indent 4 }}
@@ -35,13 +31,9 @@ metadata:
   name: {{ .Values.provisioner.service.name }}
   namespace: {{ .Values.namespaces.backend.name }}
   labels:
-{{- with .Values.monitoring }}
-{{- with .serviceMonitor }}
-{{- with .serviceSelectorLabels }}
-{{- range $k, $v := .containerProvisioner }}
+{{- with .Values.provisioner.service.labels }}
+{{- range $k, $v := . }}
     {{ $k }}: {{ $v | quote }}
-{{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{ include "smctf.labels" . | indent 4 }}
