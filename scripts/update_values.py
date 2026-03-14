@@ -122,16 +122,15 @@ def main():
         (["provisioner", "deployment", "image", "repository"], ecr_repo("container-provisioner")),
     ]
 
-    obs_updates = [
-        (["fluentbit", "serviceAccount", "annotations", "eks.amazonaws.com/role-arn"], get_output("irsa_fluentbit_role_arn")),
-    ]
-
     if kube_values.exists():
         apply_updates(kube_values, [(p, v) for p, v in kube_updates if v is not None])
     else:
         print(f"Warning: missing {kube_values}", file=sys.stderr)
 
     if obs_values.exists():
+        obs_updates = [
+            (["fluentbit", "serviceAccount", "annotations", "eks.amazonaws.com/role-arn"], get_output("irsa_fluentbit_role_arn")),
+        ]
         apply_updates(obs_values, [(p, v) for p, v in obs_updates if v is not None])
     else:
         print(f"Warning: missing {obs_values}", file=sys.stderr)
