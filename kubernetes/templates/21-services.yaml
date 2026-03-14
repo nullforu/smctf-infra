@@ -10,7 +10,7 @@ metadata:
     {{ $k }}: {{ $v | quote }}
 {{- end }}
 {{- end }}
-{{ include "smctf.labels" . | indent 4 }}
+{{ include "smctf.labels" . | nindent 4 }}
 spec:
   selector:
     app: {{ .Values.backend.deployment.name }}
@@ -36,7 +36,7 @@ metadata:
     {{ $k }}: {{ $v | quote }}
 {{- end }}
 {{- end }}
-{{ include "smctf.labels" . | indent 4 }}
+{{ include "smctf.labels" . | nindent 4 }}
 spec:
   selector:
     app: {{ .Values.provisioner.deployment.name }}
