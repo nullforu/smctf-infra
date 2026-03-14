@@ -30,7 +30,7 @@ spec:
           env:
             {{- range $key, $value := .Values.fluentbit.env }}
             - name: {{ $key }}
-              value: "{{ $value }}"
+              value: {{ $value | quote }}
             {{- end }}
           resources:
 {{ toYaml .Values.fluentbit.resources | indent 12 }}

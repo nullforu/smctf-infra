@@ -11,7 +11,7 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Values.namespaces.backend.name }}
+      - {{ .Values.targetNamespaces.backend }}
   selector:
     matchLabels:
 {{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.backend }}
@@ -35,7 +35,7 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ .Values.namespaces.backend.name }}
+      - {{ .Values.targetNamespaces.backend }}
   selector:
     matchLabels:
 {{- range $k, $v := .Values.monitoring.serviceMonitor.serviceSelectorLabels.containerProvisioner }}
