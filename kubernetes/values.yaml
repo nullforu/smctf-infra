@@ -112,6 +112,8 @@ backend:
     STACKS_MAX_SCOPE: "team"
     STACKS_MAX_PER: "2"
     STACKS_PROVISIONER_BASE_URL: "http://container-provisioner.backend.svc.cluster.local:8081"
+    STACKS_PROVISIONER_USE_GRPC: "true"
+    STACKS_PROVISIONER_GRPC_ADDR: "container-provisioner.backend.svc.cluster.local:9090"
     STACKS_PROVISIONER_TIMEOUT: "5s"
     STACKS_CREATE_WINDOW: "1m"
     STACKS_CREATE_MAX: "1"
@@ -196,6 +198,9 @@ provisioner:
   config:
     APP_ENV: "local"
     HTTP_ADDR: ":8081"
+    GRPC_ADDR: ":9090"
+    GRPC_ENABLED: "true"
+    GRPC_REFLECTION_ENABLED: "true"
     SHUTDOWN_TIMEOUT: "10s"
     API_KEY_ENABLED: "true"
     LOG_DIR: "logs"
@@ -230,6 +235,7 @@ provisioner:
       tag: latest
       pullPolicy: IfNotPresent
     port: 8081
+    grpcPort: 9090
     nodeSelector:
       role: backend
     automountServiceAccountToken: true
@@ -239,5 +245,7 @@ provisioner:
     type: ClusterIP
     port: 8081
     targetPort: 8081
+    grpcPort: 9090
+    grpcTargetPort: 9090
     labels:
       app.kubernetes.io/name: container-provisioner

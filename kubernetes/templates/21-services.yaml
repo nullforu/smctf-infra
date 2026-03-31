@@ -45,4 +45,9 @@ spec:
     - name: http
       port: {{ .Values.provisioner.service.port }}
       targetPort: {{ .Values.provisioner.service.targetPort }}
+    {{- if .Values.provisioner.service.grpcPort }}
+    - name: grpc
+      port: {{ .Values.provisioner.service.grpcPort }}
+      targetPort: {{ .Values.provisioner.service.grpcTargetPort }}
+    {{- end }}
 {{- end }}

@@ -61,6 +61,9 @@ spec:
           imagePullPolicy: {{ .Values.provisioner.deployment.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.provisioner.deployment.port }}
+            {{- if .Values.provisioner.deployment.grpcPort }}
+            - containerPort: {{ .Values.provisioner.deployment.grpcPort }}
+            {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.provisioner.configName }}
