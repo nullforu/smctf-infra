@@ -384,8 +384,8 @@ variable "vpc_cni_warm_prefix_target" {
   description = "Number of prefixes to keep warm per node when prefix delegation is enabled (0 to disable)."
   default     = 1
   validation {
-    condition     = var.vpc_cni_warm_prefix_target >= 0
-    error_message = "vpc_cni_warm_prefix_target must be 0 or greater."
+    condition     = var.vpc_cni_warm_prefix_target >= 0 && floor(var.vpc_cni_warm_prefix_target) == var.vpc_cni_warm_prefix_target
+    error_message = "vpc_cni_warm_prefix_target must be a whole number greater than or equal to 0."
   }
 }
 
