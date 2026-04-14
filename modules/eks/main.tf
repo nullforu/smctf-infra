@@ -1,7 +1,7 @@
 locals {
   vpc_cni_env = merge(
     var.vpc_cni_enable_prefix_delegation ? { ENABLE_PREFIX_DELEGATION = "true" } : {},
-    var.vpc_cni_enable_prefix_delegation && var.vpc_cni_warm_prefix_target > 0 ? { WARM_PREFIX_TARGET = tostring(var.vpc_cni_warm_prefix_target) } : {}
+    var.vpc_cni_enable_prefix_delegation && var.vpc_cni_warm_prefix_target >= 0 ? { WARM_PREFIX_TARGET = tostring(var.vpc_cni_warm_prefix_target) } : {}
   )
 
   vpc_cni_config = merge(
