@@ -373,6 +373,22 @@ variable "vpc_cni_service_account_role_arn" {
   default     = null
 }
 
+variable "vpc_cni_enable_prefix_delegation" {
+  type        = bool
+  description = "Enable VPC CNI prefix delegation to increase pod density."
+  default     = true
+}
+
+variable "vpc_cni_warm_prefix_target" {
+  type        = number
+  description = "Number of prefixes to keep warm per node when prefix delegation is enabled (0 to disable)."
+  default     = 1
+  validation {
+    condition     = var.vpc_cni_warm_prefix_target >= 0 && floor(var.vpc_cni_warm_prefix_target) == var.vpc_cni_warm_prefix_target
+    error_message = "vpc_cni_warm_prefix_target must be a whole number greater than or equal to 0."
+  }
+}
+
 variable "coredns_addon_version" {
   type        = string
   description = "CoreDNS addon version (null to use AWS default)."

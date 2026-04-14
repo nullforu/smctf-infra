@@ -98,6 +98,14 @@ variable "vpc_cni_service_account_role_arn" {
   type = string
 }
 
+variable "vpc_cni_enable_prefix_delegation" {
+  type = bool
+}
+
+variable "vpc_cni_warm_prefix_target" {
+  type = number
+}
+
 variable "coredns_addon_version" {
   type = string
 }
