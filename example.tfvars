@@ -91,6 +91,8 @@ extra_node_role_policy_arns = []
 enable_network_policy            = true
 vpc_cni_addon_version            = null
 vpc_cni_service_account_role_arn = null
+vpc_cni_enable_prefix_delegation = true
+vpc_cni_warm_prefix_target       = 1
 coredns_addon_version            = null
 
 create_bastion           = false
