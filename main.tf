@@ -99,6 +99,8 @@ module "eks" {
   enable_network_policy            = var.enable_network_policy
   vpc_cni_addon_version            = var.vpc_cni_addon_version
   vpc_cni_service_account_role_arn = var.vpc_cni_service_account_role_arn
+  vpc_cni_enable_prefix_delegation = var.vpc_cni_enable_prefix_delegation
+  vpc_cni_warm_prefix_target       = var.vpc_cni_warm_prefix_target
   coredns_addon_version            = var.coredns_addon_version
 }
 

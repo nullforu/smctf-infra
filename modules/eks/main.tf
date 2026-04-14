@@ -1,3 +1,15 @@
+locals {
+  vpc_cni_env = merge(
+    var.vpc_cni_enable_prefix_delegation ? { ENABLE_PREFIX_DELEGATION = "true" } : {},
+    var.vpc_cni_enable_prefix_delegation && var.vpc_cni_warm_prefix_target > 0 ? { WARM_PREFIX_TARGET = tostring(var.vpc_cni_warm_prefix_target) } : {}
+  )
+
+  vpc_cni_config = merge(
+    var.enable_network_policy ? { enableNetworkPolicy = "true" } : {},
+    length(local.vpc_cni_env) > 0 ? { env = local.vpc_cni_env } : {}
+  )
+}
+
 resource "aws_security_group" "eks_cluster" {
   name        = "${var.name_prefix}-eks-cluster"
   description = "EKS cluster security group"
@@ -350,9 +362,7 @@ resource "aws_eks_addon" "vpc_cni" {
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
 
-  configuration_values = var.enable_network_policy ? jsonencode({
-    enableNetworkPolicy = "true"
-  }) : null
+  configuration_values = length(local.vpc_cni_config) > 0 ? jsonencode(local.vpc_cni_config) : null
 
   depends_on = [
     aws_eks_cluster.main,
