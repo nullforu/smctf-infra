@@ -1,3 +1,9 @@
+> With the deprecation of [container-provisioner-k8s](https://github.com/nullforu/container-provisioner-k8s) in SMCTF and the adoption of [Sandboxd-O](https://github.com/swualabs/sandboxd-o), the major version of this infrastructure has been updated to **2.x.x**.
+> 
+> This change reduces unnecessary Kubernetes overhead and overengineering while improving cost efficiency.
+> 
+> Support for [container-provisioner-k8s](https://github.com/nullforu/container-provisioner-k8s) within this project is no longer provided. However, post-maintenance support for the SMCTF platform currently managed on Kubernetes will continue.
+
 # Infrastructure for SMCTF (Terraform IaC and Kubernetes Helm chart)
 
 See [SMCTF Docs](https://github.com/nullforu/smctf-docs) for more information about SMCTF and how to use this repository.
