@@ -6,6 +6,13 @@
 > 
 > Support for [container-provisioner-k8s](https://github.com/nullforu/container-provisioner-k8s) within this project is no longer provided. However, post-maintenance support for the SMCTF platform currently managed on Kubernetes will continue.
 
+> [!NOTE]
+> The new architecture in v2 has been changed to use EC2 clusters (worker nodes and control plane) for Sandboxd-O deployment and ECS for backend execution, as shown below.
+> 
+> Please refer to the repository below.
+> 
+> - ![v2 Architecture](https://github.com/nullforu/smctf-infra-v2/blob/main/assets/architecture.png?raw=true)
+
 # Infrastructure for SMCTF (Terraform IaC and Kubernetes Helm chart)
 
 See [SMCTF Docs](https://github.com/nullforu/smctf-docs) for more information about SMCTF and how to use this repository.
