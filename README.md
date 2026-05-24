@@ -11,7 +11,9 @@
 > 
 > Please refer to the repository below.
 > 
-> - ![v2 Architecture](https://github.com/nullforu/smctf-infra-v2/blob/main/assets/architecture.png?raw=true)
+> - https://github.com/nullforu/smctf-infra-v2
+> 
+> ![v2 Architecture](https://github.com/nullforu/smctf-infra-v2/blob/main/assets/architecture.png?raw=true)
 
 # Infrastructure for SMCTF (Terraform IaC and Kubernetes Helm chart)
 
