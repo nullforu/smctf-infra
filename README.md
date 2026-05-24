@@ -1,3 +1,5 @@
+> [!NOTE]
+>
 > With the deprecation of [container-provisioner-k8s](https://github.com/nullforu/container-provisioner-k8s) in SMCTF and the adoption of [Sandboxd-O](https://github.com/swualabs/sandboxd-o), the major version of this infrastructure has been updated to **2.x.x**.
 > 
 > This change reduces unnecessary Kubernetes overhead and overengineering while improving cost efficiency.
